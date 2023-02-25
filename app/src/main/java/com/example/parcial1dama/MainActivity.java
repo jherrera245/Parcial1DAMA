@@ -30,14 +30,11 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnTomarFoto;
     Button btnVerGaleria;
     Button btnCompartir;
     ImageView imgFoto;
-    String rutaImagenes;
 
-    private static final int REQUEST_CODIGO_CAMERA = 200;
-    private static final int REQUEST_CODIGO_CAPTURAR_IMAGEN = 300;
+    Uri uriImagen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnVerGaleria = findViewById(R.id.btnVerGaleria);
         btnCompartir = findViewById(R.id.btnCompartir);
-        btnTomarFoto = findViewById(R.id.btnTomarFoto);
         imgFoto = findViewById(R.id.imgInfo);
-
-        btnTomarFoto.setOnClickListener(view -> realizarProcesoFotografia());
-
-        if(imgFoto.getDrawable() == null){
-            btnCompartir.setVisibility(View.INVISIBLE);
-        }
-
 
         btnVerGaleria.setOnClickListener(view -> {
             Intent intentGaleria = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -66,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
             intentShare.setType("image/*");
             intentShare.setPackage("com.whatsapp");
 
-            if(rutaImagenes != null){
-                intentShare.putExtra(Intent.EXTRA_STREAM, Uri.parse(rutaImagenes));
+            if(uriImagen != null){
+                intentShare.putExtra(Intent.EXTRA_STREAM, uriImagen);
                 try{
                     startActivity(intentShare);
                 }catch (Exception e){
@@ -79,76 +68,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void realizarProcesoFotografia() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
-                tomarFoto();
-            }else{
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{ Manifest.permission.CAMERA}, REQUEST_CODIGO_CAMERA);
-            }
-        }else{
-            tomarFoto();
-        }
-    }
-
-    public void onRequestPermissionResult(int requestCodigo, @NonNull String[] permissions, @NonNull int[] grantResult ){
-        if(requestCodigo == REQUEST_CODIGO_CAMERA){
-            if(permissions.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED){
-                tomarFoto();
-            }else{
-                Toast.makeText(MainActivity.this,"Se requieren permisos para usar la camara", Toast.LENGTH_SHORT).show();
-            }
-        }
-        super.onRequestPermissionsResult(requestCodigo, permissions, grantResult);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
-        if(requestCode == REQUEST_CODIGO_CAPTURAR_IMAGEN){
-            if(resultCode == Activity.RESULT_OK){
-                imgFoto.setImageURI(Uri.parse(rutaImagenes));
-                btnCompartir.setVisibility(View.VISIBLE);
-            }
-
-        }
 
         if(requestCode ==1 && resultCode == RESULT_OK && data != null){
-            Uri uriImagen = data.getData();
+            uriImagen = data.getData();
             imgFoto.setImageURI( uriImagen );
-            Bitmap imgBitmap = BitmapFactory.decodeFile(rutaImagenes);
         }
 
         super.onActivityResult(requestCode,resultCode,data);
-    }
-
-    private void tomarFoto() {
-        Intent intentCamara = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(intentCamara.resolveActivity(getPackageManager()) != null){
-            File archivoFoto = null;
-            archivoFoto = crearArchivo();
-            if(archivoFoto != null){
-                Uri rutaFoto = FileProvider.getUriForFile(MainActivity.this, "com.example.usodecamara_1", archivoFoto);
-                intentCamara.putExtra(MediaStore.EXTRA_OUTPUT, rutaFoto);
-                startActivityForResult(intentCamara, REQUEST_CODIGO_CAPTURAR_IMAGEN);
-            }
-        }
-
-    }
-
-    private File crearArchivo() {
-        String nomenclatura = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String prefijoArchivo = "APPCAM_" + nomenclatura + "_";
-        File directorioImagen = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File miImagen = null;
-        try {
-            miImagen = File.createTempFile(prefijoArchivo,".jpg",directorioImagen);
-            rutaImagenes =miImagen.getAbsolutePath();
-
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
-        return miImagen;
     }
 
 }

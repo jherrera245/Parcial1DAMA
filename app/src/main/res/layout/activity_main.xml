@@ -18,31 +18,17 @@
         app:srcCompat="@drawable/ic_camera" />
 
     <Button
-        android:id="@+id/btnTomarFoto"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="#E91E63"
-        android:text="Tomar Foto"
-        app:icon="@drawable/ic_take"
-        app:iconGravity="textStart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.516"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgInfo" />
-
-    <Button
         android:id="@+id/btnCompartir"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:backgroundTint="#009688"
         android:text="Compartir"
         app:icon="@drawable/ic_share"
         app:iconGravity="textStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnTomarFoto" />
+        app:layout_constraintTop_toBottomOf="@+id/imgInfo" />
 
     <Button
         android:id="@+id/btnVerGaleria"
